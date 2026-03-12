@@ -1,160 +1,66 @@
 # 🫁 Asthma Insight
 
-An AI-powered asthma risk explorer with a modern React UI and a FastAPI backend. Users complete a short, guided symptom questionnaire and receive an estimated asthma risk score plus tailored advice.  
+An AI-driven web platform that analyzes user-submitted symptoms using machine learning to estimate the likelihood of asthma and deliver personalized medical advice. Built at the Georgetown Hackathon.
 
-> **Important**: This app is for informational purposes only and is **not** a substitute for professional medical advice, diagnosis, or treatment.
-
----
-
-## Overview
-
-- **Frontend**: Modern, dark UI built with Vite + React 18.
-- **Routing**: React Router for:
-  - `Home` (hero + disclaimer)
-  - `Symptom Checker` (3-step wizard)
-  - `Results` (gauge + factors + advice)
-- **Backend**: FastAPI service exposing:
-  - `GET /health` – health check
-  - `POST /api/predict` – returns a risk score \(0–1\), risk level, diagnosis string, top factors and advice.
-- **Model**: A `RandomForestClassifier` trained on a synthetic asthma-like dataset generated in `backend/model/train.py`. On first run the backend auto-trains and saves the model.
+![React](https://img.shields.io/badge/React_Vite-646CFF?style=flat&logo=vite&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![ML](https://img.shields.io/badge/Machine_Learning-FF6F00?style=flat&logo=scikit-learn&logoColor=white)
 
 ---
 
-## Project structure
+## 🧰 Technologies Used
 
-```text
-New folder (3)/
-├── frontend/              # Vite + React app
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── App.jsx
-│   │   ├── App.css
-│   │   └── index.css
-│   ├── vite.config.js
-│   └── .env               # VITE_API_URL
-└── backend/               # FastAPI + model
-    ├── main.py
-    ├── schemas.py
-    ├── requirements.txt
-    ├── routes/
-    │   └── predict.py
-    └── model/
-        ├── train.py
-        ├── asthma_model.pkl        # generated
-        └── feature_names.pkl       # generated
-```
+- **Frontend:** React (Vite) · HTML · CSS
+- **Backend / ML:** Python
+- **ML Model:** Scikit-learn
 
 ---
 
-## Running the app locally
+## ✨ Features
 
-### 1. Backend (FastAPI)
+- Simple symptom input form for users
+- Machine learning model estimates asthma likelihood from submitted data
+- Returns a probability score with a clear breakdown
+- Personalized medical advice tailored to each result
+- Clean, accessible UI designed for non-technical users
 
-From the project root:
+---
+
+## ⚙️ Process
+
+This project was built under hackathon pressure as a team, which meant fast decisions and clear communication. We focused on making the ML model as accurate as possible with the dataset we had, then wrapping it in an interface that felt approachable — not clinical or intimidating.
+
+The biggest challenge was integrating the Python ML backend with the React frontend within a short timeframe while keeping the user experience simple and clear.
+
+**What I learned:**
+- How to build and integrate a machine learning model into a live web app
+- Collaborating and shipping fast under real hackathon constraints
+- Designing for non-technical users — clarity matters more than complexity
+
+---
+
+## 🚀 How to Run Locally
 
 ```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate        # On Windows PowerShell / CMD
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
+# Clone the repo
+git clone https://github.com/vrivera06/asthma-insight.git
 
-The backend will be available at:
-
-- **API root**: `http://localhost:8000`
-- **Health check**: `http://localhost:8000/health`
-- **Interactive docs** (Swagger): `http://localhost:8000/docs`
-
-On first run, the API will automatically:
-
-1. Generate a synthetic asthma-like dataset.
-2. Train a `RandomForestClassifier`.
-3. Save the model and feature names under `backend/model/`.
-
-You can also retrain manually:
-
-```bash
-cd backend
-venv\Scripts\activate
-python -m model.train
-```
-
----
-
-### 2. Frontend (Vite + React)
-
-In another terminal, from the project root:
-
-```bash
+# Frontend setup
 cd frontend
-npm install          # if not already done
+npm install
 npm run dev
-```
 
-The frontend will be available at:
-
-- **Web app**: `http://localhost:5173`
-
-The Vite dev server is configured with a proxy so that any `/api/*` calls are forwarded to `http://localhost:8000`:
-
-```js
-// frontend/vite.config.js
-server: {
-  proxy: {
-    '/api': 'http://localhost:8000',
-  },
-}
-```
-
-The `.env` file in `frontend/` also sets:
-
-```bash
-VITE_API_URL=http://localhost:8000
+# Backend setup (in a new terminal)
+cd backend
+pip install -r requirements.txt
+python app.py
 ```
 
 ---
 
-## Frontend UX
+## 🔮 How It Could Be Improved
 
-- **Home page**
-  - Dark, mesh-style hero section.
-  - Animated “breathing” orb visual.
-  - Primary CTA button: “Start symptom check”.
-  - Fixed disclaimer bar at the bottom of the screen.
-
-- **Symptom Checker**
-  - 3-step wizard with progress bar:
-    1. *About you*: age, gender, smoking, physical activity.
-    2. *Your environment*: pollen, dust, pet allergy, family history.
-    3. *Your symptoms*: wheezing, shortness of breath, chest tightness, coughing.
-  - Yes/No and activity fields use pill-style toggle buttons.
-  - Submits to `POST /api/predict` and navigates to the Results page on success.
-
-- **Results page**
-  - Circular risk gauge showing risk percent.
-  - Risk level label (Low / Moderate / High) color-coded.
-  - Diagnosis text and personalized advice list.
-  - Chips showing top contributing factors.
-  - Prominent disclaimer card and “Start over” button.
-
----
-
-## API details
-
-- **POST `/api/predict`**
-  - **Request body**: `SymptomInput`
-  - **Response body**: `PredictionResult`
-  - Uses the trained RandomForest model’s `predict_proba` to compute `riskScore`.
-  - Risk level thresholds:
-    - `< 0.40` → `Low`
-    - `0.40 – 0.70` → `Moderate`
-    - `> 0.70` → `High`
-
----
-
-## Disclaimer
-
-Asthma Insight is a learning and exploration tool only. It does **not** provide a medical diagnosis and must not be used as a substitute for advice from a licensed healthcare professional. If you suspect you have asthma or any serious condition, or you are experiencing a medical emergency, call 911 or your local emergency number immediately.
-
+- Expand the dataset to improve model accuracy
+- Add a symptom history tracker for returning users
+- Connect with real medical APIs for more precise recommendations
+- Build a mobile app version
